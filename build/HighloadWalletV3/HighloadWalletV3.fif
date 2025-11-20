@@ -1,0 +1,508 @@
+"Asm.fif" include
+// automatically generated from highload_wallet.tolk
+PROGRAM{
+  0 DECLMETHOD onInternalMessage()
+  -1 DECLMETHOD onExternalMessage()
+  78748 DECLMETHOD get_public_key()
+  81467 DECLMETHOD get_subwallet_id()
+  80822 DECLMETHOD get_last_clean_time()
+  105070 DECLMETHOD get_timeout()
+  117746 DECLMETHOD isProcessed()
+  // 3 functions inlined in-place:
+  // - WalletStorage.save (2 calls)
+  // - WalletStorage.load (6 calls)
+  // - MapLookupResult<cell>.loadValue (4 calls)
+  // contracts/highload_wallet.tolk:121
+  onInternalMessage() PROC:<{ 	//  in.body
+    // 121: fun onInternalMessage(in: InMessage)
+    INMSG_BOUNCED           	//  in.body '1
+    0 THROWIF               	//  lazyS
+    // 123: match (msg)
+    x{ae42e5a4} SDBEGINSQ   	//  lazyS '10
+    IFJMP:<{                	//  lazyS
+      // 126: if (in.senderAddress != contract.getAddress())
+      INMSG_SRC             	//  lazyS '13
+      MYADDR                	//  lazyS '13 '15
+      SDEQ                  	//  lazyS '16
+      IFNOTJMP:<{           	//  lazyS
+        // 127: return()
+        DROP                	// 
+      }>                    	//  lazyS
+      // 130: setActions(msg.actions)
+      PLDREF                	//  msg.actions
+      c5 POP                	// 
+      // 131: contract.setCodePostponed(contract.getCode())
+      MYCODE                	//  '18
+      SETCODE               	// 
+    }>                      	//  lazyS
+    // 136: return()
+    DROP                    	// 
+  }>
+  // contracts/highload_wallet.tolk:142
+  onExternalMessage() PROC:<{ 	//  inMsg
+    // 144: var signature = inMsg.getLastBits(512)
+    DUP
+    9 PUSHPOW2              	//  inMsg inMsg '2=512
+    SDCUTLAST               	//  inMsg signature
+    // 103: return WalletStorage.fromCell(contract.getData())
+    c4 PUSH                 	//  inMsg signature '16
+    CTOS                    	//  inMsg signature s
+    256 LDU                 	//  inMsg signature '21 s
+    32 LDU                  	//  inMsg signature '21 '23 s
+    LDOPTREF                	//  inMsg signature '21 '23 '24 s
+    LDOPTREF                	//  inMsg signature '21 '23 '24 '25 s
+    64 LDI                  	//  inMsg signature '21 '23 '24 '25 '27 s
+    22 LDI                  	//  inMsg signature '21 '23 '24 '25 '27 '29 s
+    ENDS                    	//  inMsg signature storage.publicKey storage.subwalletId storage.oldQueries storage.queries storage.lastCleanTime storage.timeout
+    // 147: if (storage.lastCleanTime < (blockchain.now() - storage.timeout))
+    NOW                     	//  inMsg signature storage.publicKey storage.subwalletId storage.oldQueries storage.queries storage.lastCleanTime storage.timeout '30
+    OVER                    	//  inMsg signature storage.publicKey storage.subwalletId storage.oldQueries storage.queries storage.lastCleanTime storage.timeout '30 storage.timeout
+    SUB                     	//  inMsg signature storage.publicKey storage.subwalletId storage.oldQueries storage.queries storage.lastCleanTime storage.timeout '31
+    s2 PUSH                 	//  inMsg signature storage.publicKey storage.subwalletId storage.oldQueries storage.queries storage.lastCleanTime storage.timeout '31 storage.lastCleanTime
+    GREATER                 	//  inMsg signature storage.publicKey storage.subwalletId storage.oldQueries storage.queries storage.lastCleanTime storage.timeout '32
+    IF:<{                   	//  inMsg signature storage.publicKey storage.subwalletId storage.oldQueries storage.queries storage.lastCleanTime storage.timeout
+      // 148: (storage.oldQueries, storage.queries) = (storage.queries, createEmptyMap<uint13, cell>())
+      s3 POP                	//  inMsg signature storage.publicKey storage.subwalletId storage.timeout storage.queries storage.lastCleanTime
+      NEWDICT               	//  inMsg signature storage.publicKey storage.subwalletId storage.timeout storage.oldQueries storage.lastCleanTime storage.queries
+      // 149: if (storage.lastCleanTime < (blockchain.now() - (storage.timeout * 2)))
+      NOW                   	//  inMsg signature storage.publicKey storage.subwalletId storage.timeout storage.oldQueries storage.lastCleanTime storage.queries '34
+      s4 PUSH               	//  inMsg signature storage.publicKey storage.subwalletId storage.timeout storage.oldQueries storage.lastCleanTime storage.queries '34 storage.timeout
+      1 LSHIFT#             	//  inMsg signature storage.publicKey storage.subwalletId storage.timeout storage.oldQueries storage.lastCleanTime storage.queries '34 '36
+      SUB                   	//  inMsg signature storage.publicKey storage.subwalletId storage.timeout storage.oldQueries storage.lastCleanTime storage.queries '37
+      s1 s2 XCHG            	//  inMsg signature storage.publicKey storage.subwalletId storage.timeout storage.oldQueries storage.queries storage.lastCleanTime '37
+      LESS                  	//  inMsg signature storage.publicKey storage.subwalletId storage.timeout storage.oldQueries storage.queries '38
+      IF:<{                 	//  inMsg signature storage.publicKey storage.subwalletId storage.timeout storage.oldQueries storage.queries
+        // 150: storage.oldQueries = createEmptyMap()
+        NIP                 	//  inMsg signature storage.publicKey storage.subwalletId storage.timeout storage.queries
+        NEWDICT             	//  inMsg signature storage.publicKey storage.subwalletId storage.timeout storage.queries storage.oldQueries
+        // 149: if (storage.lastCleanTime < (blockchain.now() - (storage.timeout * 2)))
+        SWAP                	//  inMsg signature storage.publicKey storage.subwalletId storage.timeout storage.oldQueries storage.queries
+      }>                    	//  inMsg signature storage.publicKey storage.subwalletId storage.timeout storage.oldQueries storage.queries
+      ROT
+      // 152: storage.lastCleanTime = blockchain.now()
+      NOW                   	//  inMsg signature storage.publicKey storage.subwalletId storage.oldQueries storage.queries storage.timeout storage.lastCleanTime
+      // 147: if (storage.lastCleanTime < (blockchain.now() - storage.timeout))
+      SWAP                  	//  inMsg signature storage.publicKey storage.subwalletId storage.oldQueries storage.queries storage.lastCleanTime storage.timeout
+    }>                      	//  lazyS signature storage.publicKey storage.subwalletId storage.oldQueries storage.queries storage.lastCleanTime storage.timeout
+    // 156: val msgInnerHash = msg.body.hash()
+    s0 s7 XCHG              	//  storage.timeout signature storage.publicKey storage.subwalletId storage.oldQueries storage.queries storage.lastCleanTime lazyS
+    PLDREF                  	//  storage.timeout signature storage.publicKey storage.subwalletId storage.oldQueries storage.queries storage.lastCleanTime msg
+    DUP                     	//  storage.timeout signature storage.publicKey storage.subwalletId storage.oldQueries storage.queries storage.lastCleanTime msg msg
+    HASHCU                  	//  storage.timeout signature storage.publicKey storage.subwalletId storage.oldQueries storage.queries storage.lastCleanTime msg msgInnerHash
+    s0 s7 s6 XC2PU          	//  storage.timeout msg storage.publicKey storage.subwalletId storage.oldQueries storage.queries storage.lastCleanTime msgInnerHash signature storage.publicKey
+    // 158: assert(isSignatureValid(msgInnerHash, signature, storage.publicKey)) throw INVALID_SIGNATURE
+    CHKSIGNU                	//  storage.timeout msg storage.publicKey storage.subwalletId storage.oldQueries storage.queries storage.lastCleanTime '50
+    33 THROWIFNOT           	//  storage.timeout msg storage.publicKey storage.subwalletId storage.oldQueries storage.queries storage.lastCleanTime
+    // 160: var innerSlice = lazy MsgInner.fromCell(msg.body)
+    s0 s5 XCHG              	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries msg
+    CTOS                    	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries lazyS
+    // 162: assert(innerSlice.subwalletId == storage.subwalletId) throw INVALID_SUBWALLET_ID
+    32 LDU                  	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.subwalletId lazyS
+    LDREF                   	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.subwalletId innerSlice.messageToSend lazyS
+    8 LDU                   	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.subwalletId innerSlice.messageToSend innerSlice.sendMode lazyS
+    13 LDU                  	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.subwalletId innerSlice.messageToSend innerSlice.sendMode innerSlice.shift lazyS
+    10 LDU                  	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.subwalletId innerSlice.messageToSend innerSlice.sendMode innerSlice.shift innerSlice.bitNumber lazyS
+    64 LDU                  	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.subwalletId innerSlice.messageToSend innerSlice.sendMode innerSlice.shift innerSlice.bitNumber innerSlice.createdAt lazyS
+    22 PLDU                 	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.subwalletId innerSlice.messageToSend innerSlice.sendMode innerSlice.shift innerSlice.bitNumber innerSlice.createdAt innerSlice.timeout
+    s6 s9 XCPU              	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.timeout innerSlice.messageToSend innerSlice.sendMode innerSlice.shift innerSlice.bitNumber innerSlice.createdAt innerSlice.subwalletId storage.subwalletId
+    EQUAL                   	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.timeout innerSlice.messageToSend innerSlice.sendMode innerSlice.shift innerSlice.bitNumber innerSlice.createdAt '76
+    34 THROWIFNOT           	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.timeout innerSlice.messageToSend innerSlice.sendMode innerSlice.shift innerSlice.bitNumber innerSlice.createdAt
+    s5 s11 XCPU             	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.createdAt innerSlice.messageToSend innerSlice.sendMode innerSlice.shift innerSlice.bitNumber innerSlice.timeout storage.timeout
+    // 163: assert(innerSlice.timeout == storage.timeout) throw INVALID_TIMEOUT
+    EQUAL                   	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.createdAt innerSlice.messageToSend innerSlice.sendMode innerSlice.shift innerSlice.bitNumber '78
+    38 THROWIFNOT           	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.createdAt innerSlice.messageToSend innerSlice.sendMode innerSlice.shift innerSlice.bitNumber
+    // 164: assert(innerSlice.createdAt > blockchain.now() - storage.timeout) throw INVALID_CREATED_AT
+    NOW                     	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.createdAt innerSlice.messageToSend innerSlice.sendMode innerSlice.shift innerSlice.bitNumber '80
+    s11 PUSH                	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.createdAt innerSlice.messageToSend innerSlice.sendMode innerSlice.shift innerSlice.bitNumber '80 storage.timeout
+    SUB                     	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.createdAt innerSlice.messageToSend innerSlice.sendMode innerSlice.shift innerSlice.bitNumber '81
+    s5 PUSH                 	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.createdAt innerSlice.messageToSend innerSlice.sendMode innerSlice.shift innerSlice.bitNumber '81 innerSlice.createdAt
+    LESS                    	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.createdAt innerSlice.messageToSend innerSlice.sendMode innerSlice.shift innerSlice.bitNumber '82
+    35 THROWIFNOT           	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.createdAt innerSlice.messageToSend innerSlice.sendMode innerSlice.shift innerSlice.bitNumber
+    // 165: assert(innerSlice.createdAt <= blockchain.now()) throw INVALID_CREATED_AT
+    s0 s4 XCHG
+    NOW                     	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.bitNumber innerSlice.messageToSend innerSlice.sendMode innerSlice.shift innerSlice.createdAt '84
+    LEQ                     	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.bitNumber innerSlice.messageToSend innerSlice.sendMode innerSlice.shift '85
+    35 THROWIFNOT           	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.bitNumber innerSlice.messageToSend innerSlice.sendMode innerSlice.shift
+    s0 s5 PUSH2
+    // 167: var resOld = storage.oldQueries.get(innerSlice.shift)
+    13 PUSHINT              	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.bitNumber innerSlice.messageToSend innerSlice.sendMode innerSlice.shift innerSlice.shift storage.oldQueries '92=13
+    DICTUGET NULLSWAPIFNOT  	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.bitNumber innerSlice.messageToSend innerSlice.sendMode innerSlice.shift resOld.rawSlice resOld.isFound
+    // 168: if (resOld.isFound)
+    IF:<{                   	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.bitNumber innerSlice.messageToSend innerSlice.sendMode innerSlice.shift s
+      // 978: return TValue.fromSlice(self.rawSlice!
+      LDREF                 	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.bitNumber innerSlice.messageToSend innerSlice.sendMode innerSlice.shift '98 s
+      ENDS                  	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.bitNumber innerSlice.messageToSend innerSlice.sendMode innerSlice.shift '94
+      // 169: var value = resOld.loadValue().beginParse()
+      CTOS                  	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.bitNumber innerSlice.messageToSend innerSlice.sendMode innerSlice.shift value
+      // 170: value.skipBits(innerSlice.bitNumber)
+      s4 PUSH               	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.bitNumber innerSlice.messageToSend innerSlice.sendMode innerSlice.shift value innerSlice.bitNumber
+      SDSKIPFIRST           	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.bitNumber innerSlice.messageToSend innerSlice.sendMode innerSlice.shift value
+      // 171: assert(!value.preloadInt(1)) throw ALREADY_EXECUTED
+      1 PLDI                	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.bitNumber innerSlice.messageToSend innerSlice.sendMode innerSlice.shift '103
+      36 THROWIF            	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.bitNumber innerSlice.messageToSend innerSlice.sendMode innerSlice.shift
+    }>ELSE<{
+      // 168: if (resOld.isFound)
+      DROP                  	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.bitNumber innerSlice.messageToSend innerSlice.sendMode innerSlice.shift
+    }>
+    s0 s4 PUSH2
+    // 174: var res = storage.queries.get(innerSlice.shift)
+    13 PUSHINT              	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.bitNumber innerSlice.messageToSend innerSlice.sendMode innerSlice.shift innerSlice.shift storage.queries '111=13
+    DICTUGET NULLSWAPIFNOT  	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.bitNumber innerSlice.messageToSend innerSlice.sendMode innerSlice.shift res.rawSlice res.isFound
+    // 178: if (res.isFound)
+    IF:<{                   	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.bitNumber innerSlice.messageToSend innerSlice.sendMode innerSlice.shift s
+      // 978: return TValue.fromSlice(self.rawSlice!
+      LDREF                 	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.bitNumber innerSlice.messageToSend innerSlice.sendMode innerSlice.shift '119 s
+      ENDS                  	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.bitNumber innerSlice.messageToSend innerSlice.sendMode innerSlice.shift '115
+      // 179: var (tail, head) = res.loadValue().beginParse().loadTwoSlices(innerSlice.bitNumber)
+      CTOS                  	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.bitNumber innerSlice.messageToSend innerSlice.sendMode innerSlice.shift '120
+      s0 s4 XCHG2           	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.shift innerSlice.messageToSend innerSlice.sendMode '120 innerSlice.bitNumber
+      LDSLICEX              	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.shift innerSlice.messageToSend innerSlice.sendMode tail head
+      // 180: assert(head.loadInt(1) == 0) throw ALREADY_EXECUTED
+      1 LDI                 	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.shift innerSlice.messageToSend innerSlice.sendMode tail '127 head
+      SWAP                  	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.shift innerSlice.messageToSend innerSlice.sendMode tail head '127
+      36 THROWIF            	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.shift innerSlice.messageToSend innerSlice.sendMode tail head
+      // 181: newValue = beginCell().storeSlice(tail).storeBool(true).storeSlice(head)
+      SWAP
+      NEWC                  	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.shift innerSlice.messageToSend innerSlice.sendMode head tail '130
+      STSLICE               	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.shift innerSlice.messageToSend innerSlice.sendMode head '130
+      b{1} STSLICECONST     	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.shift innerSlice.messageToSend innerSlice.sendMode head '130
+      STSLICE               	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.shift innerSlice.messageToSend innerSlice.sendMode newValue
+    }>ELSE<{                	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.bitNumber innerSlice.messageToSend innerSlice.sendMode innerSlice.shift res.rawSlice
+      // 183: newValue = beginCell().storeZeroes(innerSlice.bitNumber).storeBool(true).storeZeroes(CELL_BIT_SIZE - innerSlice.bitNumber - 1)
+      DROP                  	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.bitNumber innerSlice.messageToSend innerSlice.sendMode innerSlice.shift
+      NEWC                  	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.bitNumber innerSlice.messageToSend innerSlice.sendMode innerSlice.shift '135
+      s4 PUSH               	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.bitNumber innerSlice.messageToSend innerSlice.sendMode innerSlice.shift '135 innerSlice.bitNumber
+      STZEROES              	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.bitNumber innerSlice.messageToSend innerSlice.sendMode innerSlice.shift '135
+      b{1} STSLICECONST     	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.bitNumber innerSlice.messageToSend innerSlice.sendMode innerSlice.shift '135
+      10 PUSHPOW2DEC        	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.bitNumber innerSlice.messageToSend innerSlice.sendMode innerSlice.shift '135 '139=1023
+      s0 s5 XCHG2           	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries '135 innerSlice.messageToSend innerSlice.sendMode innerSlice.shift '139=1023 innerSlice.bitNumber
+      SUB                   	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries '135 innerSlice.messageToSend innerSlice.sendMode innerSlice.shift '140
+      DEC                   	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries '135 innerSlice.messageToSend innerSlice.sendMode innerSlice.shift '142
+      s1 s4 XCHG            	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.shift innerSlice.messageToSend innerSlice.sendMode '135 '142
+      STZEROES              	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.shift innerSlice.messageToSend innerSlice.sendMode newValue
+    }>
+    // 186: acceptExternalMessage()
+    ACCEPT                  	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.shift innerSlice.messageToSend innerSlice.sendMode newValue
+    // 187: storage.queries.set(innerSlice.shift, newValue.endCell())
+    ENDC                    	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries storage.queries innerSlice.shift innerSlice.messageToSend innerSlice.sendMode '144
+    s0 s3 s4 XCHG3
+    13 PUSHINT              	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries innerSlice.messageToSend innerSlice.sendMode '144 innerSlice.shift storage.queries '147=13
+    DICTUSETREF             	//  storage.timeout storage.lastCleanTime storage.publicKey storage.subwalletId storage.oldQueries innerSlice.messageToSend innerSlice.sendMode storage.queries
+    // 99: contract.setData(self.toCell())
+    s0 s5 XCHG
+    NEWC                    	//  storage.timeout storage.lastCleanTime storage.queries storage.subwalletId storage.oldQueries innerSlice.messageToSend innerSlice.sendMode storage.publicKey b
+    256 STU                 	//  storage.timeout storage.lastCleanTime storage.queries storage.subwalletId storage.oldQueries innerSlice.messageToSend innerSlice.sendMode b
+    s1 s4 XCHG              	//  storage.timeout storage.lastCleanTime storage.queries innerSlice.sendMode storage.oldQueries innerSlice.messageToSend storage.subwalletId b
+    32 STU                  	//  storage.timeout storage.lastCleanTime storage.queries innerSlice.sendMode storage.oldQueries innerSlice.messageToSend b
+    s1 s2 XCHG              	//  storage.timeout storage.lastCleanTime storage.queries innerSlice.sendMode innerSlice.messageToSend storage.oldQueries b
+    STOPTREF                	//  storage.timeout storage.lastCleanTime storage.queries innerSlice.sendMode innerSlice.messageToSend b
+    s1 s3 XCHG              	//  storage.timeout storage.lastCleanTime innerSlice.messageToSend innerSlice.sendMode storage.queries b
+    STOPTREF                	//  storage.timeout storage.lastCleanTime innerSlice.messageToSend innerSlice.sendMode b
+    s1 s3 XCHG              	//  storage.timeout innerSlice.sendMode innerSlice.messageToSend storage.lastCleanTime b
+    64 STI                  	//  storage.timeout innerSlice.sendMode innerSlice.messageToSend b
+    s1 s3 XCHG              	//  innerSlice.messageToSend innerSlice.sendMode storage.timeout b
+    22 STI                  	//  innerSlice.messageToSend innerSlice.sendMode b
+    ENDC                    	//  innerSlice.messageToSend innerSlice.sendMode '154
+    c4 POP                  	//  innerSlice.messageToSend innerSlice.sendMode
+    // 189: commitContractDataAndActions()
+    COMMIT                  	//  innerSlice.messageToSend innerSlice.sendMode
+    // 190: var msgToSend = lazy Message<RemainingBitsAndRefs, CommonMessageInfo>.fromCell(innerSlice.messageToSend, { throwIfOpcodeDoesNotMatch: INVALID_MESSAGE_TO_SEND})
+    OVER                    	//  innerSlice.messageToSend innerSlice.sendMode innerSlice.messageToSend
+    CTOS                    	//  innerSlice.messageToSend innerSlice.sendMode lazyS
+    // 192: if (msgToSend.init is None)
+    // ...205: else { throw INVALID_MESSAGE_TO_SEND }
+    b{0} SDBEGINSQ          	//  innerSlice.messageToSend innerSlice.sendMode lazyS '194
+    IF:<{                   	//  innerSlice.messageToSend innerSlice.sendMode lazyS
+      1 LDI                 	//  innerSlice.messageToSend innerSlice.sendMode '198 lazyS
+      NIP                   	//  innerSlice.messageToSend innerSlice.sendMode lazyS
+      1 LDI                 	//  innerSlice.messageToSend innerSlice.sendMode '200 lazyS
+      NIP                   	//  innerSlice.messageToSend innerSlice.sendMode lazyS
+      1 LDI                 	//  innerSlice.messageToSend innerSlice.sendMode '202 lazyS
+      LDMSGADDR             	//  innerSlice.messageToSend innerSlice.sendMode '202 '203 lazyS
+      LDSTDADDR             	//  innerSlice.messageToSend innerSlice.sendMode '202 '203 '204 lazyS
+      NIP                   	//  innerSlice.messageToSend innerSlice.sendMode '202 '203 lazyS
+      LDGRAMS               	//  innerSlice.messageToSend innerSlice.sendMode '202 '203 '205 lazyS
+      NIP                   	//  innerSlice.messageToSend innerSlice.sendMode '202 '203 lazyS
+      LDOPTREF              	//  innerSlice.messageToSend innerSlice.sendMode '202 '203 '206 lazyS
+      NIP                   	//  innerSlice.messageToSend innerSlice.sendMode '202 '203 lazyS
+      LDVARUINT16           	//  innerSlice.messageToSend innerSlice.sendMode '202 '203 '209 lazyS
+      NIP                   	//  innerSlice.messageToSend innerSlice.sendMode '202 '203 lazyS
+      LDGRAMS               	//  innerSlice.messageToSend innerSlice.sendMode '202 '203 '210 lazyS
+      NIP                   	//  innerSlice.messageToSend innerSlice.sendMode '202 '203 lazyS
+      64 LDU                	//  innerSlice.messageToSend innerSlice.sendMode '202 '203 '212 lazyS
+      NIP                   	//  innerSlice.messageToSend innerSlice.sendMode '202 '203 lazyS
+      32 LDU                	//  innerSlice.messageToSend innerSlice.sendMode '202 '203 '214 lazyS
+      NIP                   	//  innerSlice.messageToSend innerSlice.sendMode '202 '203 lazyS
+      129 PUSHINT           	//  innerSlice.messageToSend innerSlice.sendMode 'USlot3 'USlot4 lazyS 'UTag=129
+    }>ELSE<{                	//  innerSlice.messageToSend innerSlice.sendMode lazyS
+      b{10} SDBEGINSQ       	//  innerSlice.messageToSend innerSlice.sendMode lazyS '194
+      IF:<{                 	//  innerSlice.messageToSend innerSlice.sendMode lazyS
+        LDMSGADDR           	//  innerSlice.messageToSend innerSlice.sendMode '218 lazyS
+        NIP                 	//  innerSlice.messageToSend innerSlice.sendMode lazyS
+        LDSTDADDR           	//  innerSlice.messageToSend innerSlice.sendMode '219 lazyS
+        NIP                 	//  innerSlice.messageToSend innerSlice.sendMode lazyS
+        LDGRAMS             	//  innerSlice.messageToSend innerSlice.sendMode '220 lazyS
+        NIP                 	//  innerSlice.messageToSend innerSlice.sendMode lazyS
+        PUSHNULL            	//  innerSlice.messageToSend innerSlice.sendMode lazyS '223
+        PUSHNULL            	//  innerSlice.messageToSend innerSlice.sendMode lazyS '223 '224
+        130 PUSHINT         	//  innerSlice.messageToSend innerSlice.sendMode lazyS 'USlot3 'USlot4 'UTag=130
+      }>ELSE<{              	//  innerSlice.messageToSend innerSlice.sendMode lazyS
+        b{11} SDBEGINSQ     	//  innerSlice.messageToSend innerSlice.sendMode lazyS '194
+        IFNOTJMP:<{         	//  innerSlice.messageToSend innerSlice.sendMode lazyS
+          37 THROW
+        }>                  	//  innerSlice.messageToSend innerSlice.sendMode lazyS
+        LDSTDADDR           	//  innerSlice.messageToSend innerSlice.sendMode '232 lazyS
+        NIP                 	//  innerSlice.messageToSend innerSlice.sendMode lazyS
+        LDMSGADDR           	//  innerSlice.messageToSend innerSlice.sendMode '233 lazyS
+        NIP                 	//  innerSlice.messageToSend innerSlice.sendMode lazyS
+        64 LDU              	//  innerSlice.messageToSend innerSlice.sendMode '235 lazyS
+        NIP                 	//  innerSlice.messageToSend innerSlice.sendMode lazyS
+        32 LDU              	//  innerSlice.messageToSend innerSlice.sendMode '237 lazyS
+        NIP                 	//  innerSlice.messageToSend innerSlice.sendMode lazyS
+        PUSHNULL            	//  innerSlice.messageToSend innerSlice.sendMode lazyS '240
+        PUSHNULL            	//  innerSlice.messageToSend innerSlice.sendMode lazyS '240 '241
+        131 PUSHINT         	//  innerSlice.messageToSend innerSlice.sendMode lazyS 'USlot3 'USlot4 'UTag=131
+      }>
+      s1 s3 s0 XCHG3        	//  innerSlice.messageToSend innerSlice.sendMode 'USlot3 'USlot4 lazyS 'UTag
+    }>                      	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 lazyS msgToSend.info.UTag
+    SWAP                    	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag lazyS
+    b{1} SDBEGINSQ          	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag lazyS '255
+    IF:<{                   	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag lazyS
+      b{0} SDBEGINSQ        	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag lazyS '266
+      IF:<{                 	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag lazyS
+        1 LDU               	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag '271 lazyS
+        SWAP                	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag lazyS '271
+        IF:<{               	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag lazyS
+          5 LDU             	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag '273 lazyS
+          NIP               	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag lazyS
+        }>ELSE<{            	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag lazyS
+        }>
+        1 PLDU              	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag '279
+        IF:<{               	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag
+        }>ELSE<{            	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag
+        }>
+      }>ELSE<{              	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag lazyS
+        b{1} SDBEGINSQ      	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag lazyS '266
+        NIP                 	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag '266
+        IFNOTJMP:<{         	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag
+          37 THROW
+        }>                  	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag
+      }>
+      135 PUSHINT           	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag 'UTag=135
+    }>ELSE<{                	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag lazyS
+      b{0} SDBEGINSQ        	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag lazyS '255
+      NIP                   	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag '255
+      IFNOTJMP:<{           	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag
+        37 THROW
+      }>                    	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag
+      136 PUSHINT           	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag 'UTag=136
+    }>                      	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag msgToSend.init.UTag
+    136 PUSHINT             	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag msgToSend.init.UTag '315=136
+    EQUAL                   	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag '314
+    // 205: else { throw INVALID_MESSAGE_TO_SEND }
+    IFJMP:<{                	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag
+      // 195: ExternalInMessageInfo => { throw INVALID_MESSAGE_TO_SEND }
+      130 PUSHINT           	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag '317=130
+      OVER                  	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag '317=130 msgToSend.info.UTag
+      EQUAL                 	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag '316
+      IFJMP:<{              	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag
+        37 THROW
+      }>                    	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag
+      // 196: ExternalOutMessageInfo => { throw INVALID_MESSAGE_TO_SEND }
+      131 PUSHINT           	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag '320=131
+      EQUAL                 	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 '319
+      IFJMP:<{              	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4
+        37 THROW
+      }>                    	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4
+      // 198: if (msgToSend.info.bounced) { throw INVALID_MESSAGE_TO_SEND }
+      SWAP                  	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot4 msgToSend.info.USlot3
+      IFJMP:<{              	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot4
+        37 THROW
+      }>                    	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot4
+      // 199: if (!(msgToSend.info.src.isNone())) { throw INVALID_MESSAGE_TO_SEND }
+      b{00} SDBEGINSQ
+      NIP                   	//  innerSlice.messageToSend innerSlice.sendMode '323
+      IFNOTJMP:<{           	//  innerSlice.messageToSend innerSlice.sendMode
+        37 THROW
+      }>                    	//  output innerSlice.sendMode
+      // 201: output.send(innerSlice.sendMode | SEND_MODE_IGNORE_ERRORS)
+      2 PUSHINT             	//  output innerSlice.sendMode '326=2
+      OR                    	//  output '327
+      SENDRAWMSG            	// 
+    }>                      	//  innerSlice.messageToSend innerSlice.sendMode msgToSend.info.USlot3 msgToSend.info.USlot4 msgToSend.info.UTag
+    // 205: else { throw INVALID_MESSAGE_TO_SEND }
+    37 THROW
+  }>
+  // contracts/highload_wallet.tolk:210
+  get_public_key() PROC:<{    	// 
+    // 103: return WalletStorage.fromCell(contract.getData())
+    c4 PUSH                 	//  '7
+    // 211: var storage = lazy WalletStorage.load()
+    CTOS                    	//  lazyS
+    // 212: return (storage.publicKey)
+    256 PLDU                	//  storage.publicKey
+  }>
+  // contracts/highload_wallet.tolk:215
+  get_subwallet_id() PROC:<{  	// 
+    // 103: return WalletStorage.fromCell(contract.getData())
+    c4 PUSH                 	//  '7
+    // 216: var storage = lazy WalletStorage.load()
+    CTOS                    	//  lazyS
+    // 217: return (storage.subwalletId)
+    256 LDU
+    NIP                     	//  lazyS
+    32 PLDU                 	//  storage.subwalletId
+  }>
+  // contracts/highload_wallet.tolk:220
+  get_last_clean_time() PROC:<{	// 
+    // 103: return WalletStorage.fromCell(contract.getData())
+    c4 PUSH                 	//  '7
+    // 221: var storage = lazy WalletStorage.load()
+    CTOS                    	//  lazyS
+    // 222: return (storage.lastCleanTime)
+    288 PUSHINT
+    SDSKIPFIRST             	//  lazyS
+    SKIPOPTREF              	//  lazyS
+    SKIPOPTREF              	//  lazyS
+    64 PLDI                 	//  storage.lastCleanTime
+  }>
+  // contracts/highload_wallet.tolk:225
+  get_timeout() PROC:<{       	// 
+    // 103: return WalletStorage.fromCell(contract.getData())
+    c4 PUSH                 	//  '7
+    // 226: var storage = lazy WalletStorage.load()
+    CTOS                    	//  lazyS
+    // 227: return (storage.timeout)
+    288 PUSHINT
+    SDSKIPFIRST             	//  lazyS
+    SKIPOPTREF              	//  lazyS
+    SKIPOPTREF              	//  lazyS
+    64 LDU
+    NIP                     	//  lazyS
+    22 PLDI                 	//  storage.timeout
+  }>
+  // contracts/highload_wallet.tolk:231
+  isProcessed() PROC:<{       	//  queryId needClean
+    // 231: fun isProcessed(queryId: int, needClean: int): int
+    c2 SAVE
+    SAMEALTSAVE
+    // 232: var shift = queryId >> BIT_NUMBER_SIZE
+    OVER                    	//  queryId needClean queryId
+    10 RSHIFT#              	//  queryId needClean shift
+    // 233: var bitNumber = queryId & CELL_BIT_SIZE
+    s0 s2 XCHG
+    10 PUSHPOW2DEC          	//  shift needClean queryId '6=1023
+    AND                     	//  shift needClean bitNumber
+    // 103: return WalletStorage.fromCell(contract.getData())
+    c4 PUSH                 	//  shift needClean bitNumber '15
+    // 235: var storage = lazy WalletStorage.load()
+    CTOS                    	//  shift needClean bitNumber lazyS
+    // 237: if (needClean)
+    288 PUSHINT             	//  shift needClean bitNumber lazyS '19=288
+    LDSLICEX                	//  shift needClean bitNumber '20 lazyS
+    LDOPTREF                	//  shift needClean bitNumber '20 storage.oldQueries lazyS
+    LDOPTREF                	//  shift needClean bitNumber '20 storage.oldQueries storage.queries lazyS
+    64 LDI                  	//  shift needClean bitNumber '20 storage.oldQueries storage.queries storage.lastCleanTime lazyS
+    DUP                     	//  shift needClean bitNumber '20 storage.oldQueries storage.queries storage.lastCleanTime '25 lazyS
+    22 PLDI                 	//  shift needClean bitNumber '20 storage.oldQueries storage.queries storage.lastCleanTime '25 storage.timeout
+    s0 s7 XCHG              	//  shift storage.timeout bitNumber '20 storage.oldQueries storage.queries storage.lastCleanTime '25 needClean
+    IF:<{                   	//  shift storage.timeout bitNumber '20 storage.oldQueries storage.queries storage.lastCleanTime '25
+      // 238: if (storage.lastCleanTime < (blockchain.now() - storage.timeout))
+      NOW                   	//  shift storage.timeout bitNumber '20 storage.oldQueries storage.queries storage.lastCleanTime '25 '28
+      s7 PUSH               	//  shift storage.timeout bitNumber '20 storage.oldQueries storage.queries storage.lastCleanTime '25 '28 storage.timeout
+      SUB                   	//  shift storage.timeout bitNumber '20 storage.oldQueries storage.queries storage.lastCleanTime '25 '29
+      s2 PUSH               	//  shift storage.timeout bitNumber '20 storage.oldQueries storage.queries storage.lastCleanTime '25 '29 storage.lastCleanTime
+      GREATER               	//  shift storage.timeout bitNumber '20 storage.oldQueries storage.queries storage.lastCleanTime '25 '30
+      IF:<{                 	//  shift storage.timeout bitNumber '20 storage.oldQueries storage.queries storage.lastCleanTime '25
+        // 239: (storage.oldQueries, storage.queries) = (storage.queries, createEmptyMap())
+        s3 POP              	//  shift storage.timeout bitNumber '20 '25 storage.queries storage.lastCleanTime
+        NEWDICT             	//  shift storage.timeout bitNumber '20 '25 storage.oldQueries storage.lastCleanTime storage.queries
+        // 240: if (storage.lastCleanTime < (blockchain.now() - (storage.timeout * 2)))
+        NOW                 	//  shift storage.timeout bitNumber '20 '25 storage.oldQueries storage.lastCleanTime storage.queries '32
+        s0 s7 XCHG          	//  shift '32 bitNumber '20 '25 storage.oldQueries storage.lastCleanTime storage.queries storage.timeout
+        1 LSHIFT#           	//  shift '32 bitNumber '20 '25 storage.oldQueries storage.lastCleanTime storage.queries '34
+        s1 s7 XCHG          	//  shift storage.queries bitNumber '20 '25 storage.oldQueries storage.lastCleanTime '32 '34
+        SUB                 	//  shift storage.queries bitNumber '20 '25 storage.oldQueries storage.lastCleanTime '35
+        LESS                	//  shift storage.queries bitNumber '20 '25 storage.oldQueries '36
+        IF:<{               	//  shift storage.queries bitNumber '20 '25 storage.oldQueries
+          // 241: storage.oldQueries = createEmptyMap()
+          DROP              	//  shift storage.queries bitNumber '20 '25
+          NEWDICT           	//  shift storage.queries bitNumber '20 '25 storage.oldQueries
+        }>                  	//  shift storage.queries bitNumber '20 '25 storage.oldQueries
+        s0 s4 XCHG2
+        // 243: storage.lastCleanTime = blockchain.now()
+        NOW                 	//  shift '25 bitNumber '20 storage.oldQueries storage.queries storage.lastCleanTime
+      }>ELSE<{
+        s6 POP              	//  shift '25 bitNumber '20 storage.oldQueries storage.queries storage.lastCleanTime
+      }>
+    }>ELSE<{
+      s6 POP                	//  shift '25 bitNumber '20 storage.oldQueries storage.queries storage.lastCleanTime
+    }>
+    // 99: contract.setData(self.toCell())
+    s0 s3 XCHG
+    NEWC                    	//  shift '25 bitNumber storage.lastCleanTime storage.oldQueries storage.queries '20 b
+    STSLICE                 	//  shift '25 bitNumber storage.lastCleanTime storage.oldQueries storage.queries b
+    s2 s(-1) PUXC           	//  shift '25 bitNumber storage.lastCleanTime storage.oldQueries storage.queries storage.oldQueries b
+    STOPTREF                	//  shift '25 bitNumber storage.lastCleanTime storage.oldQueries storage.queries b
+    s1 s(-1) PUXC           	//  shift '25 bitNumber storage.lastCleanTime storage.oldQueries storage.queries storage.queries b
+    STOPTREF                	//  shift '25 bitNumber storage.lastCleanTime storage.oldQueries storage.queries b
+    s1 s3 XCHG              	//  shift '25 bitNumber storage.queries storage.oldQueries storage.lastCleanTime b
+    64 STI                  	//  shift '25 bitNumber storage.queries storage.oldQueries b
+    s1 s4 XCHG              	//  shift storage.oldQueries bitNumber storage.queries '25 b
+    STSLICE                 	//  shift storage.oldQueries bitNumber storage.queries b
+    ENDC                    	//  shift storage.oldQueries bitNumber storage.queries '42
+    c4 POP                  	//  shift storage.oldQueries bitNumber storage.queries
+    s3 s2 PUXC
+    // 249: var resOld = storage.oldQueries.get(shift)
+    13 PUSHINT              	//  shift storage.queries bitNumber shift storage.oldQueries '49=13
+    DICTUGET NULLSWAPIFNOT  	//  shift storage.queries bitNumber resOld.rawSlice resOld.isFound
+    // 250: if (resOld.isFound)
+    IF:<{                   	//  shift storage.queries bitNumber s
+      // 978: return TValue.fromSlice(self.rawSlice!
+      LDREF                 	//  shift storage.queries bitNumber '55 s
+      ENDS                  	//  shift storage.queries bitNumber '51
+      // 251: var value = resOld.loadValue().beginParse()
+      CTOS                  	//  shift storage.queries bitNumber value
+      // 252: value.skipBits(bitNumber)
+      OVER                  	//  shift storage.queries bitNumber value bitNumber
+      SDSKIPFIRST           	//  shift storage.queries bitNumber value
+      // 253: if (value.preloadInt(1))
+      1 PLDI                	//  shift storage.queries bitNumber '59
+      IFJMP:<{              	//  shift storage.queries bitNumber
+        3 BLKDROP           	// 
+        // 254: return -1
+        -1 PUSHINT          	//  '60=-1
+        RETALT
+      }>                    	//  shift storage.queries bitNumber
+    }>ELSE<{
+      // 250: if (resOld.isFound)
+      DROP                  	//  shift storage.queries bitNumber
+    }>
+    -ROT
+    // 258: var res = storage.queries.get(shift)
+    13 PUSHINT              	//  bitNumber shift storage.queries '67=13
+    DICTUGET NULLSWAPIFNOT  	//  bitNumber res.rawSlice res.isFound
+    // 259: if (res.isFound)
+    IF:<{                   	//  bitNumber s
+      // 978: return TValue.fromSlice(self.rawSlice!
+      LDREF                 	//  bitNumber '73 s
+      ENDS                  	//  bitNumber '69
+      // 260: var valueCurrent = res.loadValue().beginParse()
+      CTOS                  	//  bitNumber valueCurrent
+      // 261: valueCurrent.skipBits(bitNumber)
+      SWAP                  	//  valueCurrent bitNumber
+      SDSKIPFIRST           	//  valueCurrent
+      // 262: if (valueCurrent.preloadInt(1))
+      1 PLDI                	//  '77
+      IFJMP:<{              	// 
+        // 263: return -1
+        -1 PUSHINT          	//  '78=-1
+        RETALT
+      }>                    	// 
+    }>ELSE<{
+      2DROP                 	// 
+    }>
+    // 267: return 0
+    0 PUSHINT               	//  '79=0
+  }>
+}END>c
